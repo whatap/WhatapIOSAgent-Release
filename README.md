@@ -26,7 +26,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 SPM 대신 직접 프레임워크를 다운로드하여 설치할 수도 있습니다:
 
 ```bash
-curl -O https://d2n3bd948dbya.cloudfront.net/uploads/debug/WhatapAgent.xcframework.zip
+curl -O https://repo.whatap-mobile-agent.io/uploads/debug/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 

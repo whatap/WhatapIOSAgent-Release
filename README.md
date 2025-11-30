@@ -5,6 +5,19 @@ Supports iOS 13 and above.
 
 ---
 
+## 📦 Latest Release
+
+**Version**: 2.3.0 (Released: 2025-12-01)
+
+### 🚨 Critical Crash Fix
+- Fixed crash in Log Export (WhatapLogHttpExporter)
+- Fixed crash in Span Export (WhatapSpanHttpExporter)
+- Enhanced error handling for production stability
+
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.3.0)
+
+---
+
 ## 🔧 Installation
 
 ### 📦 Swift Package Manager (SPM)
@@ -18,7 +31,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select the desired version or branch (e.g., `main`, `1.0.0`)
+3. Select version `2.3.0` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -26,7 +39,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -O https://repo.whatap-mobile-agent.io/uploads/debug/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.3.0/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -45,6 +58,17 @@ import WhatapAgent
 - `WhatapAgent.xcframework` (Binary Framework)
 - `Package.swift` for SwiftPM
 - iOS 13+ support
+- Crash reporting and error handling
+- Performance monitoring
+
+---
+
+## 📋 Version History
+
+| Version | Release Date | Download URL |
+|---------|--------------|--------------|
+| 2.3.0 | 2025-12-01 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.3.0/WhatapAgent.xcframework.zip) |
+| 2.1.0 | 2025-08-27 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.1.0/WhatapAgent.xcframework.zip) |
 
 ---
 
@@ -52,6 +76,7 @@ import WhatapAgent
 
 - Both SwiftPM and direct installation methods provide the same SDK functionality.
 - The framework includes necessary modules, headers, simulator and device binaries.
+- **Recommended**: Use version 2.3.0 or later for critical crash fixes.
 
 ---
 

@@ -9,14 +9,13 @@ let package = Package(
     products: [
         .library(
             name: "WhatapAgent",
-            targets: ["WhatapAgent"]
-        )
+            targets: ["WhatapAgent"])
     ],
     targets: [
         .binaryTarget(
             name: "WhatapAgent",
-            url: "https://d2n3bd948dbya.cloudfront.net/uploads/debug/WhatapAgent.xcframework.zip",
-            checksum: "f745a1ef2e360ddcb734e8aa08af8b9567d32ab3a0b6c340d95bf24894785909"
+            url: "https://repo.whatap-mobile-agent.io/uploads/2.3.0/WhatapAgent.xcframework.zip",
+            checksum: "8b26bbbc3493b973c122c68d862126fe"
         )
     ]
 )

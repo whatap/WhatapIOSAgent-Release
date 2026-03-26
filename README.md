@@ -1,7 +1,7 @@
 # WhatapAgent (iOS SDK)
 
 WhaTap iOS SDK is a framework that can be easily installed via Swift Package Manager (SPM) or directly downloaded and integrated into your project.
-Supports iOS 13 and above.
+Supports iOS 15 and above.
 
 ---
 
@@ -56,8 +56,9 @@ import WhatapAgent
 ## ✅ Included Components
 
 - `WhatapAgent.xcframework` (Binary Framework)
+- `PrivacyInfo.xcprivacy` (Apple Privacy Manifest - included in XCFramework)
 - `Package.swift` for SwiftPM
-- iOS 13+ support
+- iOS 15+ support
 - Crash reporting and error handling
 - Performance monitoring
 
@@ -76,6 +77,8 @@ import WhatapAgent
 
 - Both SwiftPM and direct installation methods provide the same SDK functionality.
 - The framework includes necessary modules, headers, simulator and device binaries.
+- **Privacy Manifest**: `PrivacyInfo.xcprivacy` is bundled in the XCFramework. No additional privacy manifest configuration is needed from the app developer.
+- **Debug Logging**: SDK console logging is disabled by default. Enable with `WhatapLogger.isDebug = true` for debugging.
 - **Recommended**: Use version 2.3.0 or later for critical crash fixes.
 
 ---

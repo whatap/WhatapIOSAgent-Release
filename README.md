@@ -7,14 +7,17 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.3.0 (Released: 2025-12-01)
+**Version**: 2.4.0 (Released: 2026-03-27)
 
-### 🚨 Critical Crash Fix
-- Fixed crash in Log Export (WhatapLogHttpExporter)
-- Fixed crash in Span Export (WhatapSpanHttpExporter)
-- Enhanced error handling for production stability
+### What's New
+- PrivacyInfo.xcprivacy included in XCFramework (Apple Privacy Manifest compliance)
+- WebView Bridge meta replacement (browser agent data classified under iOS project)
+- Debug logging disabled by default (`WhatapLogger.isDebug = false`)
+- Console log cleanup: all SDK output controlled via WhatapLogger
+- XCFramework optimized: removed unnecessary debug artifacts
+- Documentation updates: WebView guide, manual screen tracking, crash reporter options
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.3.0)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.4.0)
 
 ---
 
@@ -31,7 +34,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.3.0` (recommended) or `main` branch
+3. Select version `2.4.0` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -39,7 +42,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.3.0/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.4.0/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -68,6 +71,7 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
+| 2.4.0 | 2026-03-27 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.0/WhatapAgent.xcframework.zip) |
 | 2.3.0 | 2025-12-01 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.3.0/WhatapAgent.xcframework.zip) |
 | 2.1.0 | 2025-08-27 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.1.0/WhatapAgent.xcframework.zip) |
 
@@ -79,7 +83,7 @@ import WhatapAgent
 - The framework includes necessary modules, headers, simulator and device binaries.
 - **Privacy Manifest**: `PrivacyInfo.xcprivacy` is bundled in the XCFramework. No additional privacy manifest configuration is needed from the app developer.
 - **Debug Logging**: SDK console logging is disabled by default. Enable with `WhatapLogger.isDebug = true` for debugging.
-- **Recommended**: Use version 2.3.0 or later for critical crash fixes.
+- **Recommended**: Use version 2.4.0 or later.
 
 ---
 

@@ -7,7 +7,7 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.5.0 (Released: 2026-06-19)
+**Version**: 2.5.1 (Released: 2026-06-19)
 
 ### What's New
 - **fix(stability) — System VC hardening**: picker / share / composer 류 시스템 VC (`UIImagePickerController`, `UIDocumentPickerViewController`, `UIActivityViewController`, `PHPickerViewController`, `SFSafariViewController` 등) 진입 시 swizzling 추적 경로에서 호스트 앱이 종료되는 케이스 차단. subclass (e.g. `UIImagePickerControllerEx`) 도 `isKindOfClass` 매칭으로 동일하게 격리. 4-layer 방어 (필터 확장 + `@try/@catch` swizzling wrapper + `WhatapExceptionGuard` Swift bridge + scene activationState guard).
@@ -32,7 +32,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.5.0` (recommended) or `main` branch
+3. Select version `2.5.1` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -40,7 +40,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.5.0/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.5.1/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -69,6 +69,7 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
+| 2.5.1 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.5.1/WhatapAgent.xcframework.zip) |
 | 2.5.0 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.5.0/WhatapAgent.xcframework.zip) |
 | 2.4.4 | 2026-06-05 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.4/WhatapAgent.xcframework.zip) |
 | 2.4.3 | 2026-04-14 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.3/WhatapAgent.xcframework.zip) |
@@ -84,7 +85,7 @@ import WhatapAgent
 - The framework includes necessary modules, headers, simulator and device binaries.
 - **Privacy Manifest**: `PrivacyInfo.xcprivacy` is bundled in the XCFramework. No additional privacy manifest configuration is needed from the app developer.
 - **Debug Logging**: SDK console logging is disabled by default. Enable with `WhatapLogger.isDebug = true` for debugging.
-- **Recommended**: Use version 2.5.0 or later.
+- **Recommended**: Use version 2.5.1 or later.
 
 ---
 

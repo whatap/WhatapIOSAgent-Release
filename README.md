@@ -7,16 +7,15 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.4.4 (Released: 2026-06-05)
+**Version**: 2.5.0 (Released: 2026-06-19)
 
 ### What's New
-- **WhatapURLSession**: per-request custom attributes via `addAttribute` / request & response extractors — attached to `metrics.extras` for dashboard indexing (Android `InstrumentedDefaultHttpClient` parity)
-- **Cold-launch performance**: `WhatapIOSAgent.initialize()` main-thread time reduced ~93% (78.6 ms → 5.5 ms on iPhone 13 mini); `didFinishLaunching` total ~62% faster
-- **WebView meta auto-replacement**: in-WebView browser agent data is reclassified under the iOS project (iOS `p_code` / `project_access_key` / `session_id` / `user_id` override; `pageLocation` / `sendEventID` / `userAgent` preserved)
-- **agent_version meta accuracy**: framework version is now build-time fixed (no more bundle-identifier-dependent fallback)
-- **Hotfix (carried from 2.4.3)**: stack overflow crash in `getTopViewController` with WKWebView + SPA — depth limit + cycle detection + nil-safe navigation traversal
+- **fix(stability) — System VC hardening**: picker / share / composer 류 시스템 VC (`UIImagePickerController`, `UIDocumentPickerViewController`, `UIActivityViewController`, `PHPickerViewController`, `SFSafariViewController` 등) 진입 시 swizzling 추적 경로에서 호스트 앱이 종료되는 케이스 차단. subclass (e.g. `UIImagePickerControllerEx`) 도 `isKindOfClass` 매칭으로 동일하게 격리. 4-layer 방어 (필터 확장 + `@try/@catch` swizzling wrapper + `WhatapExceptionGuard` Swift bridge + scene activationState guard).
+- **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
+- **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. `WhatapIOSAgent.trackMethod(className:methodName:durationMs:depth:)` / `traceMethod(...)` 클로저 / `traceMethodObjC(...)` 노출. 수집된 CallStack 은 10초 주기로 묶여 `/m/log` 엔드포인트로 송신 (Android 호환 schema). 미활성 시 비용 0.
+- **chore**: swizzling layer 의 verbose NSLog 정리, `build_xcframework.sh` cleanup assertion 강화 (배포 패키지에 잡파일 잔존 시 빌드 실패).
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.4.4)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.5.0)
 
 ---
 
@@ -33,7 +32,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.4.4` (recommended) or `main` branch
+3. Select version `2.5.0` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -41,7 +40,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.4.4/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.5.0/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -70,6 +69,7 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
+| 2.5.0 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.5.0/WhatapAgent.xcframework.zip) |
 | 2.4.4 | 2026-06-05 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.4/WhatapAgent.xcframework.zip) |
 | 2.4.3 | 2026-04-14 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.3/WhatapAgent.xcframework.zip) |
 | 2.4.0 | 2026-03-27 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.0/WhatapAgent.xcframework.zip) |
@@ -84,7 +84,7 @@ import WhatapAgent
 - The framework includes necessary modules, headers, simulator and device binaries.
 - **Privacy Manifest**: `PrivacyInfo.xcprivacy` is bundled in the XCFramework. No additional privacy manifest configuration is needed from the app developer.
 - **Debug Logging**: SDK console logging is disabled by default. Enable with `WhatapLogger.isDebug = true` for debugging.
-- **Recommended**: Use version 2.4.4 or later.
+- **Recommended**: Use version 2.5.0 or later.
 
 ---
 

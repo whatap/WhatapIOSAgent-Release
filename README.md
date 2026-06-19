@@ -12,10 +12,12 @@ Supports iOS 15 and above.
 ### What's New
 - **fix(stability) — System VC hardening**: picker / share / composer 류 시스템 VC (`UIImagePickerController`, `UIDocumentPickerViewController`, `UIActivityViewController`, `PHPickerViewController`, `SFSafariViewController` 등) 진입 시 swizzling 추적 경로에서 호스트 앱이 종료되는 케이스 차단. subclass (e.g. `UIImagePickerControllerEx`) 도 `isKindOfClass` 매칭으로 동일하게 격리. 4-layer 방어 (필터 확장 + `@try/@catch` swizzling wrapper + `WhatapExceptionGuard` Swift bridge + scene activationState guard).
 - **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
-- **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. `WhatapIOSAgent.trackMethod(className:methodName:durationMs:depth:)` / `traceMethod(...)` 클로저 / `traceMethodObjC(...)` 노출. 수집된 CallStack 은 10초 주기로 묶여 `/m/log` 엔드포인트로 송신 (Android 호환 schema). 미활성 시 비용 0.
+- **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
 - **chore**: swizzling layer 의 verbose NSLog 정리, `build_xcframework.sh` cleanup assertion 강화 (배포 패키지에 잡파일 잔존 시 빌드 실패).
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.5.0)
+- **v2.5.1 patch**: CloudFront cache 우회 위한 clean re-publish (기능 동일).
+
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.5.1)
 
 ---
 

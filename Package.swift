@@ -14,8 +14,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "WhatapAgent",
-            url: "https://repo.whatap-mobile-agent.io/uploads/2.6.0/WhatapAgent.xcframework.zip",
-            checksum: "a85466a1ea22497d3d209443bb6ba646dda30b26dc68be4a0578e6e3370be5bd"
+            url: "https://repo.whatap-mobile-agent.io/uploads/2.7.0/WhatapAgent.xcframework.zip",
+            checksum: "0789db121bddcede8399ad831c4703bfe609e697e63a7838f5d5c1d30c90cbb1"
         )
     ]
 )

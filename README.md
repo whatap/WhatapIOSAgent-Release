@@ -7,7 +7,7 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.7.0 (Released: 2026-06-22)
+**Version**: 2.7.1 (Released: 2026-06-23)
 
 ### What's New
 - **fix(stability) — System VC hardening**: picker / share / composer 류 시스템 VC (`UIImagePickerController`, `UIDocumentPickerViewController`, `UIActivityViewController`, `PHPickerViewController`, `SFSafariViewController` 등) 진입 시 swizzling 추적 경로에서 호스트 앱이 종료되는 케이스 차단. subclass (e.g. `UIImagePickerControllerEx`) 도 `isKindOfClass` 매칭으로 동일하게 격리. 4-layer 방어 (필터 확장 + `@try/@catch` swizzling wrapper + `WhatapExceptionGuard` Swift bridge + scene activationState guard).
@@ -15,11 +15,12 @@ Supports iOS 15 and above.
 - **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
 - **chore**: swizzling layer 의 verbose NSLog 정리, `build_xcframework.sh` cleanup assertion 강화 (배포 패키지에 잡파일 잔존 시 빌드 실패).
 
+- **fix(v2.7.1) — Key preservation scope tightened**: v2.7.0 의 키 보존을 `.c` suffix 키 (UserLogger / ExtrasStore 의 사용자 입력 값) 로 한정. 시스템 키 (`event_name`, `framework_version`, `r_mtid` 등) 는 SDK 표준 snake_case 변환을 항상 유지. v2.7.0 에서 의도치 않게 시스템 키도 변환 OFF 되던 영향 해소.
 - **fix(exporter) — Key preservation (default change)**: LogRecord attribute 키의 강제 snake_case 변환을 **기본 비활성화**. `UserLogger.log` / `ExtrasStore` 의 원본 키가 그대로 송신됨 (e.g. `PinnedCertificate1.c` 가 `pinned_certificate1.c` 로 변환되지 않음). 기존 대시보드 쿼리가 snake_case 결과를 가정해 작성된 경우 `WhatapAgentBuilder.setKeyNormalization(true)` 로 v2.6.x 동작 복원 가능. v2.5.x ~ v2.6.x 에서 발견된 `Test(1)` / `test(1)` 류 키 충돌 (변환 후 같은 키 → 데이터 손실) 도 해결.
 - **feat(method-tracing) — StackSpan API**: `WhatapIOSAgent.start(className:methodName:) -> StackSpan` 신규. 반환된 객체의 `end()` / `endWithError(_:)` / `cancel()` 로 종료. **객체 reference 매칭** 으로 LIFO 위반 / cross-thread / async/await 환경 안전. `endWithError` 는 duration < 10ms 라도 무조건 적재 + `error_class` / `error_message` attribute 부착. `cancel` 은 적재/송신 모두 없음 (대시보드 흔적 0). 멱등성 보장 + deinit leak 감지. 기존 `methodStart` / `methodEnd` 와 같은 thread-local buffer 공유 — 혼용 안전.
 - **v2.5.1 patch**: CloudFront cache 우회 위한 clean re-publish (기능 동일).
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.0)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.1)
 
 ---
 
@@ -36,7 +37,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.7.0` (recommended) or `main` branch
+3. Select version `2.7.1` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -44,7 +45,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.0/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -73,9 +74,10 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
-| 2.7.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.0/WhatapAgent.xcframework.zip) |
-| 2.6.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.0/WhatapAgent.xcframework.zip) |
-| 2.5.1 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.0/WhatapAgent.xcframework.zip) |
+| 2.7.1 | 2026-06-23 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
+| 2.7.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
+| 2.6.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
+| 2.5.1 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
 | 2.5.0 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.5.0/WhatapAgent.xcframework.zip) |
 | 2.4.4 | 2026-06-05 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.4/WhatapAgent.xcframework.zip) |
 | 2.4.3 | 2026-04-14 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.3/WhatapAgent.xcframework.zip) |
@@ -91,7 +93,7 @@ import WhatapAgent
 - The framework includes necessary modules, headers, simulator and device binaries.
 - **Privacy Manifest**: `PrivacyInfo.xcprivacy` is bundled in the XCFramework. No additional privacy manifest configuration is needed from the app developer.
 - **Debug Logging**: SDK console logging is disabled by default. Enable with `WhatapLogger.isDebug = true` for debugging.
-- **Recommended**: Use version 2.7.0 or later.
+- **Recommended**: Use version 2.7.1 or later.
 
 ---
 

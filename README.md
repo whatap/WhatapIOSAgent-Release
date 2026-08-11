@@ -7,20 +7,30 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.7.1 (Released: 2026-06-23)
+**Version**: 2.7.10 (Released: 2026-08-10)
 
-### What's New
+### What's New (v2.7.10)
+- **fix(userlog) — Extras attribute 중복 제거**: `UserLogger.log(...)` 호출 시 `ExtrasStore` 데이터가 payload 상 두 위치 (`attributes[extra_{key}.c]` 와 `metrics.extras.{key}.c`) 에 중복으로 담기던 이슈. `UserLogger` 쪽 부착 로직 삭제, Android 정합 위치인 `metrics.extras` 만 유지. **대시보드 영향**: `metrics.extras` 참조 위젯은 무영향, `attributes[extra_*]` 참조하던 위젯은 `metrics.extras` 로 이관 필요.
+
+### What's New (v2.7.9)
+- **feat(network) — HTTP 헤더 캡처 (opt-in)**: `TracingURLProtocol` 이 처리하는 네트워크 span 에 HTTP 요청/응답 헤더를 attribute 로 부착. Builder 옵션 3종:
+  - `setCaptureRequestHeaders(_:)` — 기본 `false`
+  - `setCaptureResponseHeaders(_:)` — 기본 `false`
+  - `setHeaderValueMaxLength(_:)` — 기본 `512` bytes, `0` = 무제한
+- Attribute 네이밍: `http.request.header.<normalized>` / `http.response.header.<normalized>` (OTel + Android 정합). Key 정규화: 소문자 + `-` → `_`. 값 상한 초과 시 `...[TRUNCATED to <N>B]` 마커.
+
+### What's New (v2.7.8)
+- **feat(network) — `WhatapIOSAgent.instrument(_ config: URLSessionConfiguration)` 신규 API**: 호스트 앱이 커스텀 `URLSessionConfiguration` 을 사용해 네트워크 요청이 자동 수집 안 되는 경우 명시적으로 `TracingURLProtocol` 삽입. `URLProtocol.registerClass(...)` 의 Apple 제약 (기본 config 만 커버) 을 우회하기 위한 opt-in 헬퍼. Idempotent · `collectNetwork` opt-in 옵션 존중.
+
+### What's New (v2.7.7)
+- **fix(meta) — `device_name` 이 항상 `"iPhone"` / `"iPad"` 로만 수집되던 이슈**: `UIDevice.current.model` (제네릭) 대신 `UIDevice.current.modelIdentifier` (utsname/uname 기반 실제 기기 식별자) 사용으로 통일. Android `Build.MODEL` 과 동일한 세부도 확보 (예: `"iPhone16,1"`, `"iPad13,4"`).
+
+### What's New (v2.7.1)
 - **fix(stability) — System VC hardening**: picker / share / composer 류 시스템 VC (`UIImagePickerController`, `UIDocumentPickerViewController`, `UIActivityViewController`, `PHPickerViewController`, `SFSafariViewController` 등) 진입 시 swizzling 추적 경로에서 호스트 앱이 종료되는 케이스 차단. subclass (e.g. `UIImagePickerControllerEx`) 도 `isKindOfClass` 매칭으로 동일하게 격리. 4-layer 방어 (필터 확장 + `@try/@catch` swizzling wrapper + `WhatapExceptionGuard` Swift bridge + scene activationState guard).
 - **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
 - **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
-- **chore**: swizzling layer 의 verbose NSLog 정리, `build_xcframework.sh` cleanup assertion 강화 (배포 패키지에 잡파일 잔존 시 빌드 실패).
 
-- **fix(v2.7.1) — Key preservation scope tightened**: v2.7.0 의 키 보존을 `.c` suffix 키 (UserLogger / ExtrasStore 의 사용자 입력 값) 로 한정. 시스템 키 (`event_name`, `framework_version`, `r_mtid` 등) 는 SDK 표준 snake_case 변환을 항상 유지. v2.7.0 에서 의도치 않게 시스템 키도 변환 OFF 되던 영향 해소.
-- **fix(exporter) — Key preservation (default change)**: LogRecord attribute 키의 강제 snake_case 변환을 **기본 비활성화**. `UserLogger.log` / `ExtrasStore` 의 원본 키가 그대로 송신됨 (e.g. `PinnedCertificate1.c` 가 `pinned_certificate1.c` 로 변환되지 않음). 기존 대시보드 쿼리가 snake_case 결과를 가정해 작성된 경우 `WhatapAgentBuilder.setKeyNormalization(true)` 로 v2.6.x 동작 복원 가능. v2.5.x ~ v2.6.x 에서 발견된 `Test(1)` / `test(1)` 류 키 충돌 (변환 후 같은 키 → 데이터 손실) 도 해결.
-- **feat(method-tracing) — StackSpan API**: `WhatapIOSAgent.start(className:methodName:) -> StackSpan` 신규. 반환된 객체의 `end()` / `endWithError(_:)` / `cancel()` 로 종료. **객체 reference 매칭** 으로 LIFO 위반 / cross-thread / async/await 환경 안전. `endWithError` 는 duration < 10ms 라도 무조건 적재 + `error_class` / `error_message` attribute 부착. `cancel` 은 적재/송신 모두 없음 (대시보드 흔적 0). 멱등성 보장 + deinit leak 감지. 기존 `methodStart` / `methodEnd` 와 같은 thread-local buffer 공유 — 혼용 안전.
-- **v2.5.1 patch**: CloudFront cache 우회 위한 clean re-publish (기능 동일).
-
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.1)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.10)
 
 ---
 
@@ -37,7 +47,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.7.1` (recommended) or `main` branch
+3. Select version `2.7.10` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -45,7 +55,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.10/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 

@@ -7,7 +7,17 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.7.10 (Released: 2026-08-10)
+**Version**: 2.7.11 (Released: 2026-08-27)
+
+### What's New (v2.7.11)
+- **fix(webview) — WebView 브릿지 데이터 전량 폐기 해소**: 브라우저 에이전트 payload 의 `meta.pCode` / `meta.projectAccessKey` 가 웹 프로젝트 값 그대로 올라가 모바일 인그레스가 전량 폐기하던 이슈. 서버가 HTTP 200 + 본문 에러(`<pcode> has deleted.`) 로 응답해 흔적 없이 유실됐다. camelCase 키를 **존재할 때만** override 하도록 변경 (Android `replaceMetaFields` 정합). 통짜 merge 가 `p_platform: W_IOS` 를 오염시키던 부수 회귀도 정정.
+- **fix(webview) — Web Vitals 전량 유실 해소**: 업로드 경로를 `/webVitals_v2` → `/v2/webVitals` 로 교정 (기존 경로는 서버에 없어 404). 브릿지 method 이름 `webVitals_v2` 는 브라우저 에이전트와의 계약이라 유지.
+- **fix(webview) — `endScreenGroup` 고아 업로드 라인 제거**: ScreenGroup 종료 payload 가 `/v2/webVitals` 로 함께 올라가 Web Vitals 를 오염시키던 문제.
+- **fix(webview) — 업로드 큐 수명 창 제거**: 전송 중 들어온 청크가 닫힌 배열 뒤에 이어붙어 깨진 JSON 이 전송되거나 조용히 유실되던 구조를 스왑 방식으로 변경.
+- **fix(stability) — 호스트 앱 크래시 위험 3건 방어**: `repackV2SessionReplay` 의 `JSONSerialization` NSException 을 `WhatapExceptionGuard` 로 차단 (Swift `try?`/`catch` 로 안 잡힌다) · 누적 업로드 큐 상한 16MB 도입 (OOM 강제종료 방지) · `WhatapLogger.adapters` 데이터 레이스에 `NSLock` 도입.
+
+**Drop-in** — 코드 변경 불필요, xcframework 파일 교체만으로 적용. 공개 API 표면 변화 없음.
+**대시보드 영향**: 그동안 폐기되던 WebView 브릿지 데이터(onError / pageLoad / routeChange / event / resource / webVitals / sessionReplay)가 **새로 적재되기 시작한다.** WebView 지표가 0 이었던 프로젝트는 값이 올라온다.
 
 ### What's New (v2.7.10)
 - **fix(userlog) — Extras attribute 중복 제거**: `UserLogger.log(...)` 호출 시 `ExtrasStore` 데이터가 payload 상 두 위치 (`attributes[extra_{key}.c]` 와 `metrics.extras.{key}.c`) 에 중복으로 담기던 이슈. `UserLogger` 쪽 부착 로직 삭제, Android 정합 위치인 `metrics.extras` 만 유지. **대시보드 영향**: `metrics.extras` 참조 위젯은 무영향, `attributes[extra_*]` 참조하던 위젯은 `metrics.extras` 로 이관 필요.
@@ -30,7 +40,7 @@ Supports iOS 15 and above.
 - **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
 - **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.10)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.11)
 
 ---
 
@@ -47,7 +57,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.7.10` (recommended) or `main` branch
+3. Select version `2.7.11` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -55,7 +65,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.10/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.11/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -84,10 +94,12 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
+| 2.7.11 | 2026-08-27 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.11/WhatapAgent.xcframework.zip) |
+| 2.7.10 | 2026-08-10 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.10/WhatapAgent.xcframework.zip) |
 | 2.7.1 | 2026-06-23 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
-| 2.7.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
-| 2.6.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
-| 2.5.1 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
+| 2.7.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.0/WhatapAgent.xcframework.zip) |
+| 2.6.0 | 2026-06-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.6.0/WhatapAgent.xcframework.zip) |
+| 2.5.1 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.5.1/WhatapAgent.xcframework.zip) |
 | 2.5.0 | 2026-06-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.5.0/WhatapAgent.xcframework.zip) |
 | 2.4.4 | 2026-06-05 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.4/WhatapAgent.xcframework.zip) |
 | 2.4.3 | 2026-04-14 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.4.3/WhatapAgent.xcframework.zip) |

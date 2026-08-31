@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "WhatapAgent",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v15)
     ],
     products: [
         .library(
@@ -14,8 +14,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "WhatapAgent",
-            url: "https://repo.whatap-mobile-agent.io/uploads/2.7.11/WhatapAgent.xcframework.zip",
-            checksum: "d1c4b13b4300314bfc78723c02aa576588ba7b6fdf5cea0b5a7bb3d889beead8"
+            url: "https://repo.whatap-mobile-agent.io/uploads/2.7.12/WhatapAgent.xcframework.zip",
+            checksum: "727ed3235462ca3c590facc9dd059071baef84942696696488f60713c4e19cbc"
         )
     ]
 )

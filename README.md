@@ -7,7 +7,13 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.7.12 (Released: 2026-08-31)
+**Version**: 2.7.13 (Released: 2026-09-04)
+
+### What's New (v2.7.13)
+- **ScreenGroup 종료 타이머 크래시 수정**: 크래시 스레드가 `com.whatap.screengroup` 이고 스택이 `__CFRunLoopTimerDeallocate` 를 지나는 크래시가 더 이상 발생하지 않습니다. 앱에서 ScreenGroup API 를 직접 사용하지 않아도 해당됩니다.
+- **ScreenGroup 종료·전송 시점**: 스크롤 중에도 지연되지 않습니다. 스크롤이 많은 화면에서 ScreenGroup 의 종료 시각과 duration 분포가 이전보다 짧고 일정하게 나올 수 있습니다. 수집 항목과 전송 형식은 그대로입니다.
+
+**Drop-in** — 코드 변경 불필요, xcframework 파일 교체만으로 적용. 공개 API 표면 변화 없음 (v2.7.10 ~ v2.7.12 와 동일).
 
 ### What's New (v2.7.12)
 - **최소 지원 iOS 15.0**: 배포 바이너리의 최소 버전을 15.0 으로 낮췄습니다.
@@ -47,7 +53,7 @@ Supports iOS 15 and above.
 - **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
 - **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.12)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.13)
 
 ---
 
@@ -64,7 +70,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.7.12` (recommended) or `main` branch
+3. Select version `2.7.13` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -72,7 +78,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.12/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.13/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -101,6 +107,7 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
+| 2.7.13 | 2026-09-04 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.13/WhatapAgent.xcframework.zip) |
 | 2.7.12 | 2026-08-31 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.12/WhatapAgent.xcframework.zip) |
 | 2.7.11 | 2026-08-27 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.11/WhatapAgent.xcframework.zip) |
 | 2.7.10 | 2026-08-10 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.10/WhatapAgent.xcframework.zip) |

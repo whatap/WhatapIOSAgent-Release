@@ -7,7 +7,13 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.7.13 (Released: 2026-09-04)
+**Version**: 2.7.14 (Released: 2026-09-09)
+
+### What's New (v2.7.14)
+- **App Store Connect 업로드 검증 실패 수정**: v2.7.12 · v2.7.13 의 `WhatapAgent.framework` Info.plist 에 `CFBundleVersion` 이 없어, 해당 버전을 임베드한 앱의 업로드가 `Validation failed (409) ... missing the required key: CFBundleVersion` 으로 거부됐습니다. v2.7.14 는 이 키를 포함합니다.
+- **v2.7.12 또는 v2.7.13 을 사용 중이시면 v2.7.14 로 교체하시기 바랍니다.** 런타임 동작·수집 항목·전송 형식은 v2.7.13 과 동일하며, 바뀐 것은 Info.plist 의 키 하나입니다.
+
+**Drop-in** — 코드 변경 불필요, xcframework 파일 교체만으로 적용. 공개 API 표면 변화 없음 (v2.7.10 ~ v2.7.13 과 동일).
 
 ### What's New (v2.7.13)
 - **ScreenGroup 종료 타이머 크래시 수정**: 크래시 스레드가 `com.whatap.screengroup` 이고 스택이 `__CFRunLoopTimerDeallocate` 를 지나는 크래시가 더 이상 발생하지 않습니다. 앱에서 ScreenGroup API 를 직접 사용하지 않아도 해당됩니다.
@@ -53,7 +59,7 @@ Supports iOS 15 and above.
 - **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
 - **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.13)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.14)
 
 ---
 
@@ -70,7 +76,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.7.13` (recommended) or `main` branch
+3. Select version `2.7.14` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -78,7 +84,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.13/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.14/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -107,8 +113,9 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
-| 2.7.13 | 2026-09-04 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.13/WhatapAgent.xcframework.zip) |
-| 2.7.12 | 2026-08-31 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.12/WhatapAgent.xcframework.zip) |
+| 2.7.14 | 2026-09-09 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.14/WhatapAgent.xcframework.zip) |
+| 2.7.13 | 2026-09-04 | 사용하지 마세요 (아래 참고) |
+| 2.7.12 | 2026-08-31 | 사용하지 마세요 (아래 참고) |
 | 2.7.11 | 2026-08-27 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.11/WhatapAgent.xcframework.zip) |
 | 2.7.10 | 2026-08-10 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.10/WhatapAgent.xcframework.zip) |
 | 2.7.1 | 2026-06-23 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.1/WhatapAgent.xcframework.zip) |
@@ -124,13 +131,20 @@ import WhatapAgent
 
 ---
 
+> **v2.7.12 · v2.7.13 사용 중지 안내**
+> 두 버전의 `WhatapAgent.framework` Info.plist 에 `CFBundleVersion` 이 누락되어, 해당 버전을 임베드한 앱은
+> App Store Connect 업로드가 거부됩니다 (`Validation failed (409) ... missing the required key: CFBundleVersion`).
+> **v2.7.14 이상을 사용해 주세요.** 런타임 동작에는 영향이 없으며 업로드 단계에서만 발생합니다.
+
+---
+
 ## 📌 Notes
 
 - Both SwiftPM and direct installation methods provide the same SDK functionality.
 - The framework includes necessary modules, headers, simulator and device binaries.
 - **Privacy Manifest**: `PrivacyInfo.xcprivacy` is bundled in the XCFramework. No additional privacy manifest configuration is needed from the app developer.
 - **Debug Logging**: SDK console logging is disabled by default. Enable with `WhatapLogger.isDebug = true` for debugging.
-- **Recommended**: Use version 2.7.1 or later.
+- **Recommended**: Use version 2.7.14 or later. **v2.7.12 · v2.7.13 은 사용하지 마세요** (위 안내 참고).
 
 ---
 

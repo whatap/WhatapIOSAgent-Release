@@ -7,7 +7,19 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.7.14 (Released: 2026-09-09)
+**Version**: 2.7.15 (Released: 2026-09-22)
+
+### What's New (v2.7.15)
+- 샘플링 설정이 실제로 적용됩니다. `setSamplingRate` 로 지정한 비율대로 수집됩니다.
+- 세션 최대 지속 시간이 30분에서 4시간으로 바뀌었습니다. 15분 무작동 만료는 그대로입니다.
+  앱을 다시 실행하면 새 세션이 발급됩니다.
+- 설치형 전용으로 `setSingleSessionPerLaunch(_:)` 를 추가했습니다. 기본값은 `false` 입니다.
+- 자체 화면 추적을 구현한 앱을 위해 `notifyUserActivity()` 를 추가했습니다.
+- 잡히지 않은 Objective-C 예외의 사유가 크래시 리포트에 남습니다.
+
+코드 변경 없이 파일만 교체하면 됩니다. 늘어난 공개 API 는 위 두 개이고 기존 코드는 그대로 동작합니다.
+
+**수집되는 세션 수가 달라집니다.** 샘플링을 설정한 프로젝트는 설정값대로 줄고, 세션 최대 지속 시간이 늘면서 장시간 사용이 한 세션으로 합쳐지며, 앱을 다시 실행할 때마다 새 세션이 발급됩니다. 세션 수로 과금되는 프로젝트는 적용 전에 확인하세요.
 
 ### What's New (v2.7.14)
 - **App Store Connect 업로드 검증 실패 수정**: v2.7.12 · v2.7.13 의 `WhatapAgent.framework` Info.plist 에 `CFBundleVersion` 이 없어, 해당 버전을 임베드한 앱의 업로드가 `Validation failed (409) ... missing the required key: CFBundleVersion` 으로 거부됐습니다. v2.7.14 는 이 키를 포함합니다.
@@ -59,7 +71,7 @@ Supports iOS 15 and above.
 - **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
 - **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.14)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.15)
 
 ---
 
@@ -76,7 +88,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.7.14` (recommended) or `main` branch
+3. Select version `2.7.15` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -84,7 +96,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.14/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.15/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -113,6 +125,7 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
+| 2.7.15 | 2026-09-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.15/WhatapAgent.xcframework.zip) |
 | 2.7.14 | 2026-09-09 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.14/WhatapAgent.xcframework.zip) |
 | 2.7.13 | 2026-09-04 | 사용하지 마세요 (아래 참고) |
 | 2.7.12 | 2026-08-31 | 사용하지 마세요 (아래 참고) |

@@ -7,7 +7,32 @@ Supports iOS 15 and above.
 
 ## 📦 Latest Release
 
-**Version**: 2.7.15 (Released: 2026-09-22)
+**Version**: 2.8.0 (Released: 2026-10-19)
+
+### What's New (v2.8.0)
+- 앱이 보낸 요청과 그 요청을 받은 서버의 APM 트랜잭션을 이을 수 있습니다. `setTracingUrls` 에 넣은 URL 로 시작하는 요청에 멀티 트랜잭션 헤더(`x-wtap-po`, `x-wtap-mst`, `x-wtap-sp1`)를 붙이고, 붙일 비율은 `setTraceSampleRate` 로 정합니다(백분율, 기본 100). 설정하지 않으면 어떤 요청에도 붙이지 않습니다.
+- 자동 화면 추적을 켠 앱에서 앱을 켜고 처음 뜬 화면의 이름도 기록합니다. 이전에는 첫 화면에서 보낸 요청과 span 의 화면 이름이 비어 있었습니다.
+- 전송에 실패한 로그, span, 크래시 리포트를 기기에 보관했다가 다음에 다시 보냅니다. 네트워크 오류, 서버 무응답, 앱 종료, 백그라운드 종료로 사라지던 데이터입니다. 서버가 4xx 로 거부한 묶음과 저장한 지 18시간이 지난 묶음은 지웁니다.
+- Swift 런타임 오류(옵셔널 강제 언래핑 실패, 배열 범위 초과, `fatalError`)와 메인 스레드 스택 넘침으로 종료된 크래시가 다음 실행에 전송됩니다. 같은 크래시가 두 번 전송되던 경우도 없앴습니다.
+- WebView 브릿지를 연결한 ViewController 가 화면을 닫은 뒤 해제되지 않던 누수, 같은 `WKWebViewConfiguration` 을 쓰는 WebView 두 개에 연달아 연결하면 앱이 종료되던 문제, 앱 세션이나 화면 그룹이 바뀐 뒤 웹 페이지가 이전 세션 ID 와 화면 그룹을 쓰던 문제를 고쳤습니다. 브라우저 에이전트의 커스텀 로그를 받아 보내고, WebView 페이지 로드 시간은 브라우저가 잰 값으로 기록합니다.
+- Objective-C 에서 `setupWebViewBridge:context:` 의 context 에 `UIViewController` 가 아닌 객체나 `nil` 을 넘겨도, `setupWebViewBridge` 를 main 스레드가 아닌 곳에서 불러도 앱이 종료되지 않습니다.
+- 화면 이름이 `-end` 나 `-start` 로 끝나면 화면 그룹 이벤트가 빠지거나 이름이 잘리던 문제, 시작 직후 취소한 요청이 전송되던 문제를 고쳤습니다. `Span.addEvent` 의 `duration` 에 NaN 을 넣거나, `maxDiskFiles` 에 음수를 넣거나, 수집 서버 주소가 URL 형식이 아니거나, 기기 시각이 1970년 이전이면 앱이 종료되던 문제도 고쳤습니다.
+
+코드 변경 없이 파일만 교체하면 됩니다. 늘어난 공개 API 는 `setTracingUrls` 와 `setTraceSampleRate` 둘이고 기존 코드는 그대로 동작합니다.
+
+```swift
+let agent = WhatapAgentBuilder()
+    // 필수 3개 값 생략
+    .setCollectNetwork(true)
+    .setTracingUrls(["https://api.example.com/"])
+    .build()
+```
+
+수집되는 양이 늘 수 있습니다. 전송 실패로 사라지던 로그, span, 크래시가 보관됐다가 전송되고, 첫 화면 이름이 기록되며, Swift 런타임 크래시가 전송됩니다. 서버는 받았지만 앱이 응답을 받기 전에 끝난 데이터는 다음 실행에 다시 보내므로 같은 데이터가 두 번 들어갈 수 있습니다.
+
+기기에 보관하는 데이터의 저장 형식이 바뀝니다. 이전 버전이 기기에 남긴 데이터는 업데이트 뒤 처음 다시 보낼 때 새 형식으로 옮겨서 보냅니다.
+
+세션이 바뀌거나 화면 그룹이 바뀔 때 열려 있는 WebView 의 브릿지 스크립트를 다시 넣습니다. 이때 그 WebView 의 user script 를 모두 지웠다가 앱이 넣은 스크립트를 포함해 같은 순서로 다시 넣습니다. 앱이 넣은 스크립트의 내용과 순서는 그대로입니다.
 
 ### What's New (v2.7.15)
 - 샘플링 설정이 실제로 적용됩니다. `setSamplingRate` 로 지정한 비율대로 수집됩니다.
@@ -71,7 +96,7 @@ Supports iOS 15 and above.
 - **fix(stability) — Exporter sanitize**: `WhatapLogHttpExporter` / `WhatapSpanHttpExporter` 의 NaN/Inf 방어, snake_case key normalize, nano→milli 자동 변환. Span flush interval 1초 단축 (ScreenGroup 즉시 export 보장).
 - **feat(method-tracing) — Public API**: `WhatapAgentBuilder.enableMethodTracing(_:)` 옵트인. **2-인자 enter/exit API**: `methodStart(className:methodName:)` / `methodEnd(className:methodName:)` — thread-local stack 으로 startMs/depth 자동 관리 (Android `CallStackTracer.onEnter`/`onExit` 동등 사용감). 보조: `traceMethod` Swift 클로저, `traceMethodObjC`, `trackMethod` (이미 측정된 duration 단발). 10초 주기로 묶여 `/m/log` 송신 (Android 호환 schema). 미활성 시 비용 0.
 
-[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.7.15)
+[View Release Notes](https://github.com/whatap/WhatapIOSAgent-Release/releases/tag/v2.8.0)
 
 ---
 
@@ -88,7 +113,7 @@ You can install it in Xcode by following these steps:
 https://github.com/whatap/WhatapIOSAgent-Release.git
 ```
 
-3. Select version `2.7.15` (recommended) or `main` branch
+3. Select version `2.8.0` (recommended) or `main` branch
 4. Add the `WhatapAgent` library to your project
 
 ### 📥 Direct Download Installation
@@ -96,7 +121,7 @@ https://github.com/whatap/WhatapIOSAgent-Release.git
 You can also download and install the framework directly instead of using SPM:
 
 ```bash
-curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.7.15/WhatapAgent.xcframework.zip
+curl -L -o WhatapAgent.xcframework.zip https://repo.whatap-mobile-agent.io/uploads/2.8.0/WhatapAgent.xcframework.zip
 unzip WhatapAgent.xcframework.zip
 ```
 
@@ -125,6 +150,7 @@ import WhatapAgent
 
 | Version | Release Date | Download URL |
 |---------|--------------|--------------|
+| 2.8.0 | 2026-10-19 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.8.0/WhatapAgent.xcframework.zip) |
 | 2.7.15 | 2026-09-22 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.15/WhatapAgent.xcframework.zip) |
 | 2.7.14 | 2026-09-09 | [Download](https://repo.whatap-mobile-agent.io/uploads/2.7.14/WhatapAgent.xcframework.zip) |
 | 2.7.13 | 2026-09-04 | 사용하지 마세요 (아래 참고) |
